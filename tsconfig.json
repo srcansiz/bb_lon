@@ -3,14 +3,15 @@
     "compilerOptions": {
         "module": "es6",
         "target": "es6", 
-      "sourceMap": true,    
-      "outDir": "./dist", 
-      "types": [
-        "@babylonjs/core",
-        "@babylonjs/gui",
-        "@babylonjs/materials",
-      ],
-      "rootDir": "."                    
+        "sourceMap": true,    
+         "outDir": "./dist", 
+        "types": [
+            "@babylonjs/core",
+            "@babylonjs/gui",
+            "@babylonjs/materials",
+        ],
+        "moduleResolution": "node",
+        "rootDir": "."                    
     },
     "include": [
       "src/**/*"
