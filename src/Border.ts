@@ -5,7 +5,6 @@ export class Border {
 
     public scene: Scene
     public ground: GroundMesh
-
     constructor(scene: Scene, ground: GroundMesh ){
 
         this.scene = scene
@@ -13,16 +12,18 @@ export class Border {
     }
 
 
-    createBorder = () => {
+    createBorder = (scene_size: Array<number>) => {
         
         console.log(this.ground)
         const border = MeshBuilder.CreateBox("border-1", {
-            height: 1,
+            height: 3,
             width: 0.1,
-            depth: 10, 
+            depth: scene_size[0], 
         }, this.scene )
         
-        border.position = new Vector3(-5, 0.5, 0) 
+        let border_pos = scene_size[0] / 2
+
+        border.position = new Vector3(-border_pos, 1.5, 0) 
 
         const border_2 = border.clone("border-2")
         const border_3 = border.clone("border-3")
@@ -30,12 +31,12 @@ export class Border {
 
 
         border_2.rotation.y = Math.PI / 2;
-        border_2.position = new Vector3(0, 0.5, +5)
+        border_2.position = new Vector3(0, 1.5, border_pos)
 
-        border_3.position = new Vector3(5, 0.5, 0)
+        border_3.position = new Vector3(border_pos, 1.5, 0)
 
         border_4.rotation.y = Math.PI / 2;
-        border_4.position = new Vector3(0, 0.5, -5)
+        border_4.position = new Vector3(0, 1.5, -border_pos)
         
         border.material = this.applyMaterial()
         border_2.material = this.applyMaterial()
