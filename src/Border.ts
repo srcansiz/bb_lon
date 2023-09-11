@@ -16,14 +16,14 @@ export class Border {
         
         console.log(this.ground)
         const border = MeshBuilder.CreateBox("border-1", {
-            height: 3,
+            height: scene_size[0]/6,
             width: 0.1,
             depth: scene_size[0], 
         }, this.scene )
         
         let border_pos = scene_size[0] / 2
 
-        border.position = new Vector3(-border_pos, 1.5, 0) 
+        border.position = new Vector3(-border_pos, (scene_size[0]/6)/2, 0) 
 
         const border_2 = border.clone("border-2")
         const border_3 = border.clone("border-3")
@@ -31,12 +31,12 @@ export class Border {
 
 
         border_2.rotation.y = Math.PI / 2;
-        border_2.position = new Vector3(0, 1.5, border_pos)
+        border_2.position = new Vector3(0, (scene_size[0]/6)/2, border_pos)
 
-        border_3.position = new Vector3(border_pos, 1.5, 0)
+        border_3.position = new Vector3(border_pos, (scene_size[0]/6)/2, 0)
 
         border_4.rotation.y = Math.PI / 2;
-        border_4.position = new Vector3(0, 1.5, -border_pos)
+        border_4.position = new Vector3(0, (scene_size[0]/6)/2, -border_pos)
         
         border.material = this.applyMaterial()
         border_2.material = this.applyMaterial()

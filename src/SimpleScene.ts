@@ -21,7 +21,7 @@ export class SimpleScene{
     public engine: Engine
     public scene: Scene
     private canvas: HTMLCanvasElement
-    private scene_size: Array<number> = [30, 30]
+    private scene_size: Array<number> = [15, 15]
 
     constructor(canvas: HTMLCanvasElement){
         this.canvas = canvas
@@ -48,11 +48,25 @@ export class SimpleScene{
         // new V3 (Vector 3 positions the camera on 3D)
         const camera = new FreeCamera("camera", new V3(0, 10, -40), scene);
         
-        camera.speed = 0.25
+        camera.speed = 0.45
 
         // Camera control
         camera.setTarget(V3.Zero());
         camera.attachControl(this.canvas, true);
+
+        // Inverts camera move with mouse click
+        //camera.angularSensibility *= -1
+
+
+        scene.onPointerDown = (e) => {
+            if(e.button == 0){
+                this.engine.enterPointerlock()
+            }
+
+            if(e.button == 1){
+                this.engine.exitPointerlock()
+            }
+        }
 
         // Creates a light, aiming 0,1,0
         const light = new HemisphericLight("light", new V3(0, 1, 0), scene);
@@ -64,7 +78,7 @@ export class SimpleScene{
 
         border.createBorder(this.scene_size)
         this.createTube()
-        this.loadRoadBarrier()
+        this.loadTreasureChest()
         return scene
 
     }
@@ -97,15 +111,24 @@ export class SimpleScene{
            new V3(0.0, 1, 2.0)
         ];
         let tube = MeshBuilder.CreateTube("tube", {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}, this.scene)
-        tube.position = new V3(-12, 1, 3)
+        tube.position = new V3(-5, 1, 3)
     
     }
 
 
-    public loadRoadBarrier = async (): Promise<void> => {
+    public loadTreasureChest = async (): Promise<void> => {
 
        const {meshes} = await SceneLoader.ImportMeshAsync( "", 
-       "assets/models/", "concrete_road.gltf", this.scene, (meshes) => {})
+       "assets/models/treasure_chest_1k/", "treasure_chest_1k.gltf", this.scene)
+
+
+    //    meshes.forEach((mesh) => {
+    //         mesh.scaling = new V3(1.5,1.5,1.5)            
+    //    })
+
+       let root_mesh = meshes[0]
+       root_mesh.position = new V3(5, 0, 6)
+
     }
 
 
