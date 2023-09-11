@@ -10,10 +10,14 @@ import {
     Texture,
     Mesh,
     int,
-    SceneLoader
+    SceneLoader,
+    HDRCubeTexture,
+    PointLight,
+    DirectionalLight,
 } from "@babylonjs/core"
 import '@babylonjs/loaders'
 import {Border} from './Border'
+import { Obstacle } from "./Obstacle"
 
 
 export class SimpleScene{
@@ -22,21 +26,28 @@ export class SimpleScene{
     public scene: Scene
     private canvas: HTMLCanvasElement
     private scene_size: Array<number> = [15, 15]
+    private obstacle: Obstacle 
+
 
     constructor(canvas: HTMLCanvasElement){
         this.canvas = canvas
         this.engine = new Engine(canvas);
         this.scene = this.createScene()
-
     }
 
     /**
      * Create scene for the 3D view
      */
     public createScene(): Scene {
-        let scene = new Scene(this.engine)
-    
 
+
+
+        let scene = new Scene(this.engine)
+        this.obstacle = new Obstacle(scene)
+        this.scene = scene
+
+        this.createSkybox()
+        
         // Add a ground 
         const ground = MeshBuilder.CreateGround(
             "ground", {width: this.scene_size[0], height: this.scene_size[1], updatable: true}, this.scene);
@@ -46,9 +57,9 @@ export class SimpleScene{
 
         // Camera view 
         // new V3 (Vector 3 positions the camera on 3D)
-        const camera = new FreeCamera("camera", new V3(0, 10, -40), scene);
+        const camera = new FreeCamera("camera", new V3(0, 10, -25), scene);
         
-        camera.speed = 0.45
+        camera.speed = 0.35
 
         // Camera control
         camera.setTarget(V3.Zero());
@@ -69,7 +80,7 @@ export class SimpleScene{
         }
 
         // Creates a light, aiming 0,1,0
-        const light = new HemisphericLight("light", new V3(0, 1, 0), scene);
+        const light = new HemisphericLight("pointLight", new V3(0, 1, 0), scene);;
         // Dim the light a small amount 0 - 1
         light.intensity = 1;
         
@@ -79,6 +90,8 @@ export class SimpleScene{
         border.createBorder(this.scene_size)
         this.createTube()
         this.loadTreasureChest()
+
+        this.obstacle.build("box", "obstacle-1",  new V3(1, 0, -2), {height: 1.5, width:1.5})
         return scene
 
     }
@@ -111,7 +124,7 @@ export class SimpleScene{
            new V3(0.0, 1, 2.0)
         ];
         let tube = MeshBuilder.CreateTube("tube", {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}, this.scene)
-        tube.position = new V3(-5, 1, 3)
+        tube.position = new V3(-5, 0, 3)
     
     }
 
@@ -120,11 +133,6 @@ export class SimpleScene{
 
        const {meshes} = await SceneLoader.ImportMeshAsync( "", 
        "assets/models/treasure_chest_1k/", "treasure_chest_1k.gltf", this.scene)
-
-
-    //    meshes.forEach((mesh) => {
-    //         mesh.scaling = new V3(1.5,1.5,1.5)            
-    //    })
 
        let root_mesh = meshes[0]
        root_mesh.position = new V3(5, 0, 6)
@@ -137,6 +145,15 @@ export class SimpleScene{
         this.engine.runRenderLoop( () => {
             this.scene.render()
         })
+    }
+
+
+    public createSkybox = () => {
+
+        
+        const texture = new HDRCubeTexture('assets/textures/table_mountain_1_puresky_2k.hdr', this.scene, 200);
+        this.scene.createDefaultSkybox(texture, false, 1000, 0.0)
+
     }
 
 }
