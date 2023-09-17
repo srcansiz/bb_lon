@@ -27,7 +27,7 @@ export class SimpleScene{
     private canvas: HTMLCanvasElement
     private scene_size: Array<number> = [15, 15]
     private obstacle: Obstacle 
-
+    private meshes: Mesh[] = []
 
     constructor(canvas: HTMLCanvasElement){
         this.canvas = canvas
@@ -51,24 +51,18 @@ export class SimpleScene{
         // Add a ground 
         const ground = MeshBuilder.CreateGround(
             "ground", {width: this.scene_size[0], height: this.scene_size[1], updatable: true}, this.scene);
+       
         
+        this.meshes.push(ground)
+
+
         //ground.applyDisplacementMap("assets/textures/ground/herringbone_parquet_disp_1k.jpg", 0, 1);
         ground.material = this.createGroundMaterial()
 
-        // Camera view 
-        // new V3 (Vector 3 positions the camera on 3D)
-        const camera = new FreeCamera("camera", new V3(0, 10, -25), scene);
+        this.createCamera(scene)
         
-        camera.speed = 0.35
 
-        // Camera control
-        camera.setTarget(V3.Zero());
-        camera.attachControl(this.canvas, true);
-
-        // Inverts camera move with mouse click
-        //camera.angularSensibility *= -1
-
-
+        // Moving within having pointer down
         scene.onPointerDown = (e) => {
             if(e.button == 0){
                 this.engine.enterPointerlock()
@@ -87,13 +81,75 @@ export class SimpleScene{
 
         const border = new Border(scene, ground)
 
-        border.createBorder(this.scene_size)
-        this.createTube()
+        let borders = border.createBorder(this.scene_size)
+        this.meshes.push(...borders)
         this.loadTreasureChest()
 
-        this.obstacle.build("box", "obstacle-1",  new V3(1, 0, -2), {height: 1.5, width:1.5})
+        this.meshes.push(...[
+            this.obstacle.build("box", "obstacle-1",  new V3(1, 0.75, -2), {height: 1.5, width:1.5}, "wood" ),
+            this.obstacle.build("box", "obstacle-2",  new V3(1, 0.75, 2), {height: 1.5, width:1.5}, "bricks"),
+            this.obstacle.build("box", "obstacle-3",  new V3(-3, 0.75, -2), {height: 1.5, width:1.5}, "wood"),
+            this.obstacle.build("box", "obstacle-3-1",  new V3(-3, 2, -2), {height: 1, width:1}, "bricks"),
+        ])
+
+
+        // ------- TUBE -----------------------------------
+        let path = [
+            new V3(0.0, 1, 0.0),
+            new V3(0.0, 1, 2.0)
+        ];
+        let tube_1 = this.obstacle.build("tube", "tube-1", 
+             new V3(-5, -1, 3),
+            {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}   ,
+            "wood" 
+        )
+        let tube_2 = this.obstacle.build("tube", "tube-1", 
+        new V3(5, -1, -3),
+            {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}   ,
+            "wood" 
+        )
+        this.meshes.push(...[tube_1, tube_2])
+        // -------------------------------------------------
+
+        this.meshes.forEach((mesh: Mesh) => {
+            mesh.checkCollisions = true
+        })
         return scene
 
+    }
+
+    public createCamera = (scene: Scene) => {
+
+        // Camera view 
+        // new V3 (Vector 3 positions the camera on 3D)
+        const camera = new FreeCamera("camera", new V3(0, 2.5, 0), scene);
+        
+        camera.speed = 0.35
+
+        // Camera control
+        camera.setTarget(V3.Zero());
+        camera.attachControl(this.canvas, true);
+
+
+        camera.applyGravity = true 
+        camera.checkCollisions = true 
+        camera.ellipsoid = new V3(0.4, 0.3, 0.5)
+        
+        // Getting closer to object without getting into it
+        camera.minZ = 0.25
+
+        camera.angularSensibility = 4000
+        // Inverts camera move with mouse click
+        //camera.angularSensibility *= -1
+    }
+
+
+    public applyGravityAndCollision = (scene: Scene) => {
+
+        let frameRate = 60
+        let earthGravity = -9.81
+        scene.gravity = new V3(0, earthGravity/frameRate, 0)
+        scene.collisionsEnabled = true
     }
 
     public createGroundMaterial = (): StandardMaterial => {
@@ -101,12 +157,12 @@ export class SimpleScene{
         const g = new StandardMaterial("ground", this.scene)
         let diffuseTexture = new Texture("assets/textures/ground/herringbone_parquet_diff_1k.jpg", this.scene)
         let aoTexture = new Texture("assets/textures/ground/herringbone_parquet_ao_1k.jpg", this.scene)
-        let normalTexture = new Texture("assets/textures/ground/herringbone_parquet_nor_1k.jpg", this.scene)
+        let normalTexture = new Texture("assets/textures/ground/herringbone_parquet_nor_gl_1k.jpg", this.scene)
 
 
         let textures = [diffuseTexture, aoTexture, normalTexture]
         g.diffuseTexture = diffuseTexture
-        // g.bumpTexture = normalTexture
+        g.bumpTexture = normalTexture
         g.ambientTexture = aoTexture
 
         textures.forEach( (t) => {
@@ -118,15 +174,15 @@ export class SimpleScene{
     }
 
 
-    public createTube = () => {
-        const path = [
-           new V3(0.0, 1, 0.0),
-           new V3(0.0, 1, 2.0)
-        ];
-        let tube = MeshBuilder.CreateTube("tube", {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}, this.scene)
-        tube.position = new V3(-5, 0, 3)
+    // public createTube = () => {
+    //     const path = [
+    //        new V3(0.0, 1, 0.0),
+    //        new V3(0.0, 1, 2.0)
+    //     ];
+    //     let tube = MeshBuilder.CreateTube("tube", {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}, this.scene)
+    //     tube.position = new V3(-5, 0, 3)
     
-    }
+    // }
 
 
     public loadTreasureChest = async (): Promise<void> => {

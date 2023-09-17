@@ -14,7 +14,6 @@ export class Border {
 
     createBorder = (scene_size: Array<number>) => {
         
-        console.log(this.ground)
         const border = MeshBuilder.CreateBox("border-1", {
             height: scene_size[0]/6,
             width: 0.1,
@@ -42,6 +41,8 @@ export class Border {
         border_2.material = this.applyMaterial()
         border_3.material = this.applyMaterial()
         border_4.material = this.applyMaterial()
+
+        return [border, border_2, border_3, border_4]
     }
 
     applyMaterial = (): StandardMaterial => {
