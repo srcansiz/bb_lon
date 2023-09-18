@@ -118,6 +118,11 @@ export class SimpleScene{
 
     }
 
+
+    /**
+     * Create Camera
+     * @param scene {Scene}
+     */
     public createCamera = (scene: Scene) => {
 
         // Camera view 
@@ -127,7 +132,7 @@ export class SimpleScene{
         
         camera.speed = 0.35
 
-        // Camera control
+        // Camera control ------------------------------
         camera.setTarget(V3.Zero());
         camera.attachControl(this.canvas, true);
 
@@ -136,12 +141,16 @@ export class SimpleScene{
         camera.checkCollisions = true 
         camera.ellipsoid = new V3(0.6, 0.6, 0.5)
         
-        // // Getting closer to object without getting into it
+        // Min distance that camera see from
         camera.minZ = 0.25
         camera.angularSensibility = 4000
     }
 
 
+    /**
+     * Applies gravity and enables collisions
+     * @param scene {Scene}
+     */
     public applyGravityAndCollision = (scene: Scene) => {
 
         let frameRate = 60

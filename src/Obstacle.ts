@@ -77,5 +77,5 @@ export class Obstacle {
         return mat
     }
 
-    
+
 }  
