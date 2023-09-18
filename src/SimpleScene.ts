@@ -46,7 +46,7 @@ export class SimpleScene{
         this.obstacle = new Obstacle(scene)
         this.scene = scene
 
-        // this.createSkybox()
+        this.createSkybox()
         
         // Add a ground 
         const ground = MeshBuilder.CreateGround(
