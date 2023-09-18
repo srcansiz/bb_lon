@@ -46,19 +46,17 @@ export class SimpleScene{
         this.obstacle = new Obstacle(scene)
         this.scene = scene
 
-        this.createSkybox()
+        // this.createSkybox()
         
         // Add a ground 
         const ground = MeshBuilder.CreateGround(
             "ground", {width: this.scene_size[0], height: this.scene_size[1], updatable: true}, this.scene);
-       
-        
+               
         this.meshes.push(ground)
 
-
-        //ground.applyDisplacementMap("assets/textures/ground/herringbone_parquet_disp_1k.jpg", 0, 1);
         ground.material = this.createGroundMaterial()
-
+        
+    
         this.createCamera(scene)
         
 
@@ -67,7 +65,6 @@ export class SimpleScene{
             if(e.button == 0){
                 this.engine.enterPointerlock()
             }
-
             if(e.button == 1){
                 this.engine.exitPointerlock()
             }
@@ -80,10 +77,11 @@ export class SimpleScene{
         
 
         const border = new Border(scene, ground)
-
         let borders = border.createBorder(this.scene_size)
         this.meshes.push(...borders)
+        
         this.loadTreasureChest()
+
 
         this.meshes.push(...[
             this.obstacle.build("box", "obstacle-1",  new V3(1, 0.75, -2), {height: 1.5, width:1.5}, "wood" ),
@@ -93,7 +91,7 @@ export class SimpleScene{
         ])
 
 
-        // ------- TUBE -----------------------------------
+        // // ------- TUBE -----------------------------------
         let path = [
             new V3(0.0, 1, 0.0),
             new V3(0.0, 1, 2.0)
@@ -109,7 +107,9 @@ export class SimpleScene{
             "wood" 
         )
         this.meshes.push(...[tube_1, tube_2])
-        // -------------------------------------------------
+        // // -------------------------------------------------
+
+        this.applyGravityAndCollision(scene)
 
         this.meshes.forEach((mesh: Mesh) => {
             mesh.checkCollisions = true
@@ -123,6 +123,7 @@ export class SimpleScene{
         // Camera view 
         // new V3 (Vector 3 positions the camera on 3D)
         const camera = new FreeCamera("camera", new V3(0, 2.5, 0), scene);
+       // const camera = new FreeCamera("camera", new V3(0, 5, -15), scene);
         
         camera.speed = 0.35
 
@@ -133,14 +134,11 @@ export class SimpleScene{
 
         camera.applyGravity = true 
         camera.checkCollisions = true 
-        camera.ellipsoid = new V3(0.4, 0.3, 0.5)
+        camera.ellipsoid = new V3(0.6, 0.6, 0.5)
         
-        // Getting closer to object without getting into it
+        // // Getting closer to object without getting into it
         camera.minZ = 0.25
-
         camera.angularSensibility = 4000
-        // Inverts camera move with mouse click
-        //camera.angularSensibility *= -1
     }
 
 
@@ -174,15 +172,6 @@ export class SimpleScene{
     }
 
 
-    // public createTube = () => {
-    //     const path = [
-    //        new V3(0.0, 1, 0.0),
-    //        new V3(0.0, 1, 2.0)
-    //     ];
-    //     let tube = MeshBuilder.CreateTube("tube", {radius: 1, path: path, sideOrientation: Mesh.DOUBLESIDE, updatable: true}, this.scene)
-    //     tube.position = new V3(-5, 0, 3)
-    
-    // }
 
 
     public loadTreasureChest = async (): Promise<void> => {

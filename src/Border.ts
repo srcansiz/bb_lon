@@ -55,7 +55,7 @@ export class Border {
 
         m.diffuseTexture = diffTexture
         m.ambientTexture = aoTexture
-        // m.bumpTexture = norTexture
+        m.bumpTexture = norTexture
 
         let textures = [diffTexture, aoTexture, norTexture]
 
